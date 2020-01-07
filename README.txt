@@ -1,4 +1,4 @@
-Copy webroot to services/drupal/public
+Copy webroot to services/drupal/docroot
 
 Move vm.env to .env
 
