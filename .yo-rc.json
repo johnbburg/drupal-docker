@@ -1,7 +1,7 @@
 {
   "generator-web-starter": {
     "promptValues": {
-      "name": "artsgov",
+      "name": "drupal-docker",
       "platform": "Docker",
       "dockerCms": "Drupal8",
       "dockerSearch": "Solr",
