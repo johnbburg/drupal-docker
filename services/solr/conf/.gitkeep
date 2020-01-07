@@ -1,0 +1,3 @@
+This file is used to preserve the services/solr/conf directory.
+
+Make sure that you update this directory with new Solr configuration as it is generated.

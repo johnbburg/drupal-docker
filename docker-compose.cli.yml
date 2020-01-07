@@ -1,0 +1,21 @@
+# This is the Compose file for command-line services.
+# Anything that doesn't need to be run as part of the main `docker-compose up'
+# command should reside in here and be invoked by a helper script.
+version: "3.7"
+services:
+  drush:
+    build: ./services/drush
+    entrypoint:
+      - /var/www/html/vendor/bin/drush
+    working_dir: /var/www/html/docroot
+    volumes:
+      - ./services/drupal:/var/www/html:cached
+      - type: volume
+        source: fs-data
+        target: /var/www/html/docroot/sites/default/files
+  composer:
+    image: composer:1.7
+    volumes:
+      - ./services/drupal:/app:cached
+volumes:
+  {}

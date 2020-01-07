@@ -1,0 +1,16 @@
+{
+  "generator-web-starter": {
+    "promptValues": {
+      "name": "artsgov",
+      "platform": "Docker",
+      "dockerCms": "Drupal8",
+      "dockerSearch": "Solr",
+      "dockerCache": "Memcache",
+      "documentRoot": "docroot",
+      "useGesso": false,
+      "useCapistrano": false,
+      "solrTag": "5"
+    },
+    "projectName": "artsgov"
+  }
+}

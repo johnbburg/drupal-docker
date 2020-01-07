@@ -1,0 +1,85 @@
+# This is the Docker Compose entry point for this project.
+# Services listed in this file will automatically be built and started when you bring
+# the project up.
+version: "3.7"
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 8080:80
+      - 8443:443
+    depends_on:
+      - drupal
+    volumes:
+      - ${F1_TLS_CERT}:/etc/nginx/ssl/local.crt:ro,cached
+      - ${F1_TLS_KEY}:/etc/nginx/ssl/local.key:ro,cached
+      - ./services/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro,cached
+      - ./services/drupal/docroot:/var/www/html/docroot:cached
+      - type: volume
+        source: fs-data
+        target: /var/www/html/docroot/sites/default/files
+        read_only: true
+  drupal:
+    build: ./services/drupal
+    command:
+      - sh
+      - -c
+      - |-
+        chmod -R 0777 /var/www/html/docroot/sites/default/files
+        if test ! -z "${F1_XDEBUG:-}"; then
+          docker-php-ext-enable xdebug
+          echo 'xdebug.remote_enable=1' > /usr/local/etc/php/conf.d/xdebug.ini
+        fi
+        exec php-fpm
+    depends_on:
+      - mysql
+    environment:
+      SMTPHOST: mailhog:1025
+      XDEBUG_CONFIG: remote_host=${F1_XDEBUG_REMOTE:-127.0.0.1}
+    volumes:
+      - ./services/drupal:/var/www/html:cached
+      - type: volume
+        source: fs-data
+        target: /var/www/html/docroot/sites/default/files
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: web
+      MYSQL_USER: web
+      MYSQL_PASSWORD: web
+      MYSQL_RANDOM_ROOT_PASSWORD: "yes"
+    ports:
+      - 13306:3306
+    volumes:
+      - type: volume
+        source: mysql-data
+        target: /var/lib/mysql
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+  solr:
+    image: solr:5-alpine
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |-
+        args=()
+        if test -e /opt/f1/solr-conf/solrconfig.xml; then
+          args=(-d /opt/f1/solr-conf)
+        fi
+
+        exec solr-create -c docker "$${args[@]}"
+    ports:
+      - 8983:8983
+    volumes:
+      - type: volume
+        source: solr-data
+        target: /opt/solr/server/solr
+      - ./services/solr/conf:/opt/f1/solr-conf:cached
+  memcached:
+    image: memcached:alpine
+volumes:
+  fs-data: null
+  mysql-data: null
+  solr-data: null
