@@ -11,6 +11,6 @@
       "useCapistrano": false,
       "solrTag": "5"
     },
-    "projectName": "artsgov"
+    "projectName": "drupal-docker"
   }
 }
